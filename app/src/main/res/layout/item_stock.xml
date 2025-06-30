@@ -4,82 +4,98 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_marginHorizontal="6dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor"> <!-- Ensure theme color is used -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="12dp"> <!-- Slightly increased padding for breathing room -->
 
-        <!-- Stock Logo/Placeholder -->
+        <!-- Stock Logo/Placeholder - Centered at the top -->
         <ImageView
             android:id="@+id/stockLogoImageView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:contentDescription="@string/stock_logo_description"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-
+            android:layout_marginTop="4dp"
             tools:src="@drawable/ic_stock_placeholder" />
 
-        <!-- Stock Symbol -->
+        <!-- Stock Symbol - Centered below logo -->
         <TextView
             android:id="@+id/stockSymbolTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="?android:attr/textColorPrimary"
-            app:layout_constraintStart_toEndOf="@id/stockLogoImageView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/stockPriceTextView"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/stockLogoImageView"
             tools:text="AAPL" />
 
-        <!-- Stock Name -->
+        <!-- Stock Name - Centered below symbol, smaller text -->
         <TextView
             android:id="@+id/stockNameTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
             android:layout_marginTop="2dp"
             android:textSize="14sp"
             android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toEndOf="@id/stockLogoImageView"
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/stockSymbolTextView"
-            app:layout_constraintEnd_toStartOf="@id/stockPriceTextView"
-            app:layout_constraintHorizontal_bias="0.0"
             tools:text="Apple Inc." />
 
-        <!-- Stock Price -->
+        <!-- Stock Price - Centered below name, prominent -->
         <TextView
             android:id="@+id/stockPriceTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="?android:attr/textColorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/stockNameTextView"
             tools:text="175.00 USD" />
 
-        <!-- Stock Change -->
+        <!-- Stock Change & Change Percent - Centered below price, in a horizontal chain -->
         <TextView
             android:id="@+id/stockChangeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintEnd_toStartOf="@+id/stockChangePercentTextView"
+            app:layout_constraintTop_toBottomOf="@id/stockPriceTextView"
+            tools:text="+2.50"
+            tools:textColor="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/stockChangePercentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@+id/stockChangeTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/stockPriceTextView"
-            tools:text="+2.50 (+1.45%)"
+            tools:text="(+1.45%)"
             tools:textColor="@android:color/holo_green_dark" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

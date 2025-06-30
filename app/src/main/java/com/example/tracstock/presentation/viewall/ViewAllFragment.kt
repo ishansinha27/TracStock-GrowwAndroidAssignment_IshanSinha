@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tracstock.R
 import com.example.tracstock.databinding.FragmentViewAllBinding
@@ -62,7 +63,7 @@ class ViewAllFragment : Fragment() {
             findNavController().navigate(action)
         }
         binding.viewAllStocksRecyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = GridLayoutManager(context,2)
             adapter = stockAdapter
         }
     }

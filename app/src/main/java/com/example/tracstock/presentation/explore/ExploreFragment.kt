@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.example.tracstock.R
@@ -59,7 +60,7 @@ class ExploreFragment : Fragment() {
             findNavController().navigate(action)
         }
         binding.rvTopGainers.apply {
-            layoutManager=LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
+            layoutManager=GridLayoutManager(context,2)
             adapter=topGainersAdapter
 
         }
@@ -68,7 +69,7 @@ class ExploreFragment : Fragment() {
             findNavController().navigate(action)
         }
         binding.rvTopLosers.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = GridLayoutManager(context,2)
             adapter = topLosersAdapter
         }
         searchResultsAdapter = SearchStockAdapter { stock -> // <<<< Use SearchStockAdapter

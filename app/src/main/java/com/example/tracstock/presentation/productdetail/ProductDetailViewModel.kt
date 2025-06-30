@@ -11,6 +11,7 @@ import com.example.tracstock.domain.model.Stock
 import com.example.tracstock.domain.usecase.productdetail.GetCompanyOverview
 import com.example.tracstock.domain.usecase.productdetail.GetHistoricalDailyAdjusted
 import com.example.tracstock.domain.usecase.productdetail.IsStockInWatchlist
+import com.example.tracstock.domain.usecase.watchlist.AddStockToWatchlist
 import com.example.tracstock.domain.usecase.watchlist.GetWatchlistItems
 import com.example.tracstock.domain.usecase.watchlist.GetWatchlists
 import com.example.tracstock.domain.usecase.watchlist.RemoveStockFromWatchlist
@@ -28,7 +29,8 @@ class ProductDetailViewModel @Inject constructor(
     private val isStockInWatchlist: IsStockInWatchlist,
     private val getWatchlists: GetWatchlists,
     private val removeStockFromWatchlist: RemoveStockFromWatchlist,
-    private val getWatchlistItems: GetWatchlistItems
+    private val getWatchlistItems: GetWatchlistItems,
+    private val addStockToWatchlist: AddStockToWatchlist
 ) : ViewModel() {
 
     // LiveData for Company Overview
@@ -47,6 +49,9 @@ class ProductDetailViewModel @Inject constructor(
     // LiveData to track if the current stock is in *any* watchlist
     private val _isStockInAnyWatchlist = MutableLiveData<Boolean>()
     val isStockInAnyWatchlist: LiveData<Boolean> = _isStockInAnyWatchlist
+
+    private val _watchlistEvent = MutableLiveData<WatchlistOperationEvent>()
+    val watchlistEvent: LiveData<WatchlistOperationEvent> = _watchlistEvent
 
     // The stock symbol received from navigation arguments
     val stockSymbol: String = savedStateHandle["symbol"] ?: ""
@@ -115,6 +120,19 @@ class ProductDetailViewModel @Inject constructor(
             // Refresh status
             checkWatchlistStatus(stock.symbol)
         }
+    }
+    fun onStockAddedToWatchlist(stockSymbol: String) {
+        // After a stock is added (e.g., via dialog), refresh the watchlist status.
+        // This will cause _isStockInAnyWatchlist to update, changing the button state.
+        checkWatchlistStatus(stockSymbol)
+        _watchlistEvent.value = WatchlistOperationEvent.StockAdded(stockSymbol) // Optional: signal UI
+    }
+
+    // <<<< UPDATED SEALED CLASS FOR WATCHLIST EVENTS >>>>
+    sealed class WatchlistOperationEvent {
+        data class StockRemoved(val stockSymbol: String) : WatchlistOperationEvent()
+        data class StockAdded(val stockSymbol: String) : WatchlistOperationEvent() // <<<< NEW EVENT
+        data class ShowMessage(val message: String) : WatchlistOperationEvent()
     }
 
 

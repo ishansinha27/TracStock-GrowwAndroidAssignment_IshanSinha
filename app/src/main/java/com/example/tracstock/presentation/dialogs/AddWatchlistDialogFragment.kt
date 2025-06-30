@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController // Ensure this import is present!
 
 import com.example.tracstock.domain.model.Stock
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,6 +23,7 @@ import com.example.tracstock.util.showSnackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import com.example.tracstock.domain.model.Watchlist // Import Watchlist model
 
 @AndroidEntryPoint
 class AddWatchlistDialogFragment : DialogFragment() {
@@ -32,9 +34,9 @@ class AddWatchlistDialogFragment : DialogFragment() {
     private val viewModel: WatchlistViewModel by viewModels() // Use shared ViewModel
     private val args : AddWatchlistDialogFragmentArgs by navArgs()
 
-
     private var selectedWatchlistId: Long? = null
     private var selectedWatchlistName: String? = null
+    private var allWatchlists: List<Watchlist> = emptyList() // <<<< FIX: Declare allWatchlists here
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,6 +105,7 @@ class AddWatchlistDialogFragment : DialogFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.watchlists.collectLatest { watchlists ->
+                        allWatchlists = watchlists // <<<< FIX: Assign collected watchlists to allWatchlists
                         if (watchlists.isEmpty()) {
                             delay(2500)
                             binding.existingWatchlistSection.visibility = View.GONE
@@ -153,10 +156,25 @@ class AddWatchlistDialogFragment : DialogFragment() {
                 is WatchlistViewModel.WatchlistEvent.WatchlistCreated -> {
                     // Show success message and dismiss dialog
                     binding.root.showSnackbar(getString(R.string.watchlist_created_success, binding.newWatchlistNameEditText.text.toString().trim()))
-                    dismiss()
+                    // If stock is being added, automatically select the new watchlist
+                    if (args.isAddToWatchlist) {
+                        // Find the position of the newly created watchlist and select it
+                        // <<<< FIX: Use AutoCompleteTextView instead of Spinner, and update selection logic >>>>
+                        val newWatchlistPosition = allWatchlists.indexOfFirst { it.id == event.watchlistId }
+                        if (newWatchlistPosition != -1) {
+                            val newWatchlistName = allWatchlists[newWatchlistPosition].name
+                            binding.existingWatchlistAutoCompleteTextView.setText(newWatchlistName, false)
+                            selectedWatchlistId = event.watchlistId
+                            selectedWatchlistName = newWatchlistName
+                        }
+                    } else {
+                        dismiss() // Dismiss if only creating a watchlist
+                    }
                 }
                 is WatchlistViewModel.WatchlistEvent.StockAddedToWatchlist -> {
                     binding.root.showSnackbar(getString(R.string.stock_added_to_watchlist_success, event.stockSymbol))
+                    // <<<< CRITICAL FIX: Set result for ProductDetailFragment >>>>
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("stockAddedToWatchlist", true)
                     dismiss() // Dismiss dialog on successful add
                 }
                 is WatchlistViewModel.WatchlistEvent.ShowMessage -> {

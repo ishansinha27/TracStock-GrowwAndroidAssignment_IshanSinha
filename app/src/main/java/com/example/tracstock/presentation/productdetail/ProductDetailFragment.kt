@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 
@@ -58,6 +59,16 @@ class ProductDetailFragment : Fragment() {
         if (viewModel.stockSymbol.isBlank()) {
             viewModel.fetchStockDetails(args.symbol)
         }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<Boolean>("stockAddedToWatchlist")
+            ?.observe(viewLifecycleOwner) { isAdded ->
+                if (isAdded) {
+                    viewModel.onStockAddedToWatchlist(viewModel.stockSymbol)
+                }
+            }
+
+
+
     }
 
     private fun setupChart() {
@@ -207,13 +218,30 @@ class ProductDetailFragment : Fragment() {
                 binding.addToWatchlistButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorLoss))
             } else {
                 binding.addToWatchlistButton.setText(R.string.add_to_watchlist)
-                binding.addToWatchlistButton.setIconResource(R.drawable.ic_watchlist_remove)
+                binding.addToWatchlistButton.setIconResource(R.drawable.ic_watchlist_add)
                 binding.addToWatchlistButton.setIconTintResource(R.color.colorPrimary) // Use primary color for add
                 binding.addToWatchlistButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             }
         }
 
+        viewModel.watchlistEvent.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is ProductDetailViewModel.WatchlistOperationEvent.StockRemoved -> {
+                    binding.root.showSnackbar(getString(R.string.stock_removed_from_watchlist, event.stockSymbol))
+                    // No explicit checkWatchlistStatus call here as it's done in ViewModel
+                }
+                is ProductDetailViewModel.WatchlistOperationEvent.StockAdded -> { // <<<< NEW EVENT HANDLER
+                    binding.root.showSnackbar(getString(R.string.stock_added_to_watchlist_success, event.stockSymbol))
+                    // No explicit checkWatchlistStatus call here as it's done in ViewModel
+                }
+                is ProductDetailViewModel.WatchlistOperationEvent.ShowMessage -> {
+                    binding.root.showSnackbar(event.message)
+                }
+            }
+        }
     }
+
+
 
     /**
      * Populates and updates the LineChart with historical price data.
@@ -256,43 +284,42 @@ class ProductDetailFragment : Fragment() {
      */
     private fun setupClickListeners() {
         binding.addToWatchlistButton.setOnClickListener {
-            val currentOverview = viewModel.companyOverview.value?.data
-            val currentSymbol = viewModel.stockSymbol
-
-            if (currentOverview != null && currentSymbol.isNotBlank()) {
-                val stock = Stock(
-                    symbol = currentSymbol,
-                    name = currentOverview.name,
-                    price = viewModel.historicalData.value?.data?.lastOrNull()?.adjustedClose ?: currentOverview.marketCapitalization,
-                    currency = currentOverview.currency
-                )
-
-                if (viewModel.isStockInAnyWatchlist.value == true) {
-                    // REMOVE from watchlist
+            val isCurrentlyInWatchlist = viewModel.isStockInAnyWatchlist.value ?: false
+            if (isCurrentlyInWatchlist) {
+                // If currently in watchlist, remove it
+                val currentOverview = viewModel.companyOverview.value?.data
+                val currentSymbol = viewModel.stockSymbol
+                if (currentOverview != null && currentSymbol.isNotBlank()) {
+                    val stock = Stock(
+                        symbol = currentSymbol,
+                        name = currentOverview.name,
+                        price = viewModel.currentPrice.value?.split(" ")?.get(0) ?: "0.0", // Use current price from LiveData
+                        currency = viewModel.currentPrice.value?.split(" ")?.getOrElse(1) { "USD" } ?: "USD"
+                    )
                     viewModel.removeStockFromAnyWatchlist(stock)
                 } else {
-                    // ADD to watchlist (existing behavior)
+                    binding.root.showSnackbar("Stock details not fully loaded yet for removal.")
+                }
+            } else {
+                // If not in watchlist, add it (navigate to dialog)
+                val currentOverview = viewModel.companyOverview.value?.data
+                val currentPriceText = viewModel.currentPrice.value ?: "0.0 USD"
+                val currentPriceValue = currentPriceText.split(" ")[0]
+                val currentCurrency = currentPriceText.split(" ").getOrElse(1) { "USD" }
+
+                if (currentOverview != null && viewModel.stockSymbol.isNotBlank()) {
+                    val stockName = currentOverview.name
                     val action = ProductDetailFragmentDirections.actionProductDetailFragmentToAddWatchlistDialogFragment(
-                        stockSymbol = currentSymbol,
-                        stockName = stock.name,
-                        stockPrice = stock.price,
-                        stockCurrency = stock.currency,
+                        stockSymbol = viewModel.stockSymbol,
+                        stockName = stockName,
+                        stockPrice = currentPriceValue,
+                        stockCurrency = currentCurrency,
                         isAddToWatchlist = true
                     )
                     findNavController().navigate(action)
-
+                } else {
+                    binding.root.showSnackbar("Stock details not fully loaded yet for adding.")
                 }
-            } else {
-                binding.root.showSnackbar("Stock details not fully loaded yet.")
-            }
-        }
-
-        // Optionally, observe removeResult to show a message/snackbar
-        viewModel.removeResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Resource.Success -> binding.root.showSnackbar("Removed from watchlist.")
-                is Resource.Error -> binding.root.showSnackbar(result.message ?: "Failed to remove.")
-                else -> {}
             }
         }
     }
