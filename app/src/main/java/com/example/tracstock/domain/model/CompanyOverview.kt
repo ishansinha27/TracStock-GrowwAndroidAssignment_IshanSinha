@@ -7,7 +7,7 @@ data class CompanyOverview(
     val description: String,
     val cik: String,
     val exchange: String,
-    val currency: String, // Already here, directly maps from API for consistency
+    val currency: String,
     val country: String,
     val sector: String,
     val industry: String,

@@ -16,11 +16,10 @@ class SearchStockAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         init {
-            // Set click listener for the entire item view
             binding.root.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onItemClick(getItem(position)) // getItem() is protected in ListAdapter, but accessible here.
+                    onItemClick(getItem(position))
                 }
             }
         }
@@ -29,8 +28,6 @@ class SearchStockAdapter(
             binding.apply {
                 searchStockTickerTextView.text = stock.symbol
                 searchCompanyNameTextView.text = stock.name
-                // Note: The search endpoint typically does not return current price,
-                // so we don't display it here as per previous discussion.
             }
         }
     }
@@ -49,16 +46,12 @@ class SearchStockAdapter(
         holder.bind(stock)
     }
 
-    /**
-     * DiffUtil Callback for [Stock] objects, used for efficient RecyclerView updates.
-     */
     class SearchStockDiffCallback : DiffUtil.ItemCallback<Stock>() {
         override fun areItemsTheSame(oldItem: Stock, newItem: Stock): Boolean {
-            return oldItem.symbol == newItem.symbol // Stocks are the same if their symbols are identical
-        }
+            return oldItem.symbol == newItem.symbol }
 
         override fun areContentsTheSame(oldItem: Stock, newItem: Stock): Boolean {
-            return oldItem == newItem // Data contents are the same
+            return oldItem == newItem
         }
     }
 }

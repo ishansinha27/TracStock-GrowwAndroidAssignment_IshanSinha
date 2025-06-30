@@ -12,7 +12,7 @@ import com.example.tracstock.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest // For Flow collection
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ class ExploreViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             fetchTopGainers()
-            delay(1500L) // Wait 1.5 seconds before fetching the next list
+            delay(1500L)
             fetchTopLosers()
         }
     }
@@ -66,12 +66,12 @@ class ExploreViewModel @Inject constructor(
             return
         }
         searchJob = viewModelScope.launch {
-            delay(500L) // Debounce delay: wait for 500ms after user stops typing
+            delay(500L)
 
-            _searchResults.value = Resource.Loading() // Show loading state for search
+            _searchResults.value = Resource.Loading()
 
-            val result = searchStocks.invoke(query) // Call the search use case
-            _searchResults.value = result // Update LiveData with search result
+            val result = searchStocks.invoke(query)
+            _searchResults.value = result
         }
     }
 }

@@ -14,7 +14,7 @@ data class SymbolMatchDto(
     @SerializedName("5. marketOpen") val marketOpen: String?,
     @SerializedName("6. marketClose") val marketClose: String?,
     @SerializedName("7. timezone") val timezone: String?,
-    @SerializedName("8. currency") val currency: String?, // Currency is explicitly provided here
+    @SerializedName("8. currency") val currency: String?,
     @SerializedName("9. matchScore") val matchScore: String?
 )
 

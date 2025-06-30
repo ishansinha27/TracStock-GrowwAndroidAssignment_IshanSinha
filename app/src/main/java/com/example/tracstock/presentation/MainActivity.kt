@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavView.setupWithNavController(navController)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.exploreFragment, // This ID MUST match your <fragment> ID in nav_graph.xml and <item> ID in bottom_nav_menu.xml
-                R.id.watchlistFragment // This ID MUST match your <fragment> ID in nav_graph.xml and <item> ID in bottom_nav_menu.xml
+                R.id.exploreFragment,
+                R.id.watchlistFragment
             )
         )
 

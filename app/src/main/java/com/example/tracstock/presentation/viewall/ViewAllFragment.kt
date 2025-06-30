@@ -41,7 +41,7 @@ class ViewAllFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Set Toolbar title dynamically based on the category
+
         val title = when (args.category) {
             "top_gainers" -> getString(R.string.category_top_gainers)
             "top_losers" -> getString(R.string.category_top_losers)
@@ -53,9 +53,6 @@ class ViewAllFragment : Fragment() {
         observeViewModel()
     }
 
-    /**
-     * Initializes the RecyclerView with its adapter and layout manager.
-     */
     private fun setupRecyclerView() {
         stockAdapter = StockAdapter { stock ->
             // Navigate to ProductDetailFragment when a stock item is clicked
@@ -68,9 +65,6 @@ class ViewAllFragment : Fragment() {
         }
     }
 
-    /**
-     * Observes LiveData from the ViewModel and updates the UI.
-     */
     private fun observeViewModel() {
         viewModel.stocks.observe(viewLifecycleOwner) { resource ->
             when (resource) {

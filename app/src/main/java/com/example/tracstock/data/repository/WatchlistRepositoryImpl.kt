@@ -25,13 +25,11 @@ class WatchlistRepositoryImpl @Inject constructor(
             val newWatchlistId = watchlistDao.insertWatchlist(WatchlistEntity(name = name))
             Resource.Success(newWatchlistId)
         } catch (e: Exception) {
-            // Check for unique constraint violation if you add one later
             Resource.Error("Failed to create watchlist: ${e.message}")
         }
     }
 
     override fun getWatchlists(): Flow<List<Watchlist>> {
-        // Map flow of WatchlistEntity to flow of Watchlist domain model
         return watchlistDao.getAllWatchlists().map { entities ->
             entities.map { it.toWatchlist() }
         }
@@ -39,7 +37,6 @@ class WatchlistRepositoryImpl @Inject constructor(
 
     override suspend fun addStockToWatchlist(watchlistId: Long, stock: Stock): Resource<Unit> {
         return try {
-            // Use the extension function on Stock to create the entity
             val watchlistItemEntity = stock.toWatchlistItemEntity(watchlistId)
             watchlistDao.insertWatchlistItem(watchlistItemEntity)
             Resource.Success(Unit)
@@ -50,11 +47,11 @@ class WatchlistRepositoryImpl @Inject constructor(
 
     override suspend fun removeStockFromWatchlist(watchlistId: Long, stock: Stock): Resource<Unit> {
         return try {
-            // Create a WatchlistItemEntity that matches the one to be deleted
+
             val watchlistItemEntity = com.example.tracstock.data.local.entities.WatchlistItemEntity(
                 watchlistId = watchlistId,
                 stockSymbol = stock.symbol,
-                stockName = stock.name, // These might not be used for deletion, but for completeness
+                stockName = stock.name,
                 stockPrice = stock.price,
                 stockCurrency = stock.currency
             )
@@ -83,7 +80,7 @@ class WatchlistRepositoryImpl @Inject constructor(
     }
 
     override fun getStocksInWatchlist(watchlistId: Long): Flow<List<WatchlistItem>> {
-        // Map flow of WatchlistItemEntity to flow of WatchlistItem domain model
+
         return watchlistDao.getStocksInWatchlist(watchlistId).map { entities ->
             entities.map { it.toWatchlistItem() }
         }

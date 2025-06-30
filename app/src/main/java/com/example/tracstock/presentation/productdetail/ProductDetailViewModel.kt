@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle, // For accessing navigation arguments
+    private val savedStateHandle: SavedStateHandle,
     private val getCompanyOverview: GetCompanyOverview,
     private val getHistoricalData: GetHistoricalDailyAdjusted,
     private val isStockInWatchlist: IsStockInWatchlist,
@@ -33,11 +33,9 @@ class ProductDetailViewModel @Inject constructor(
     private val addStockToWatchlist: AddStockToWatchlist
 ) : ViewModel() {
 
-    // LiveData for Company Overview
     private val _companyOverview = MutableLiveData<Resource<CompanyOverview>>()
     val companyOverview: LiveData<Resource<CompanyOverview>> = _companyOverview
 
-    // LiveData for Historical Data (for chart)
     private val _historicalData = MutableLiveData<Resource<List<HistoricalPrice>>>()
     val historicalData: LiveData<Resource<List<HistoricalPrice>>> = _historicalData
 
@@ -46,18 +44,16 @@ class ProductDetailViewModel @Inject constructor(
 
     private val _removeResult = MutableLiveData<Resource<Unit>>()
     val removeResult: LiveData<Resource<Unit>> = _removeResult
-    // LiveData to track if the current stock is in *any* watchlist
+
     private val _isStockInAnyWatchlist = MutableLiveData<Boolean>()
     val isStockInAnyWatchlist: LiveData<Boolean> = _isStockInAnyWatchlist
 
     private val _watchlistEvent = MutableLiveData<WatchlistOperationEvent>()
     val watchlistEvent: LiveData<WatchlistOperationEvent> = _watchlistEvent
 
-    // The stock symbol received from navigation arguments
     val stockSymbol: String = savedStateHandle["symbol"] ?: ""
 
     init {
-        // Fetch details when ViewModel is created, using the passed symbol
         if (stockSymbol.isNotBlank()) {
             fetchStockDetails(stockSymbol)
         } else {
@@ -67,29 +63,24 @@ class ProductDetailViewModel @Inject constructor(
         }
     }
 
-
     fun fetchStockDetails(symbol: String) {
         viewModelScope.launch {
-            // Fetch Company Overview
             _companyOverview.value = Resource.Loading()
             val overviewResult = getCompanyOverview(symbol)
             _companyOverview.value = overviewResult
 
-            // Fetch Historical Data
             _historicalData.value = Resource.Loading()
             val historicalResult = getHistoricalData(symbol)
             _historicalData.value = historicalResult
 
             if (historicalResult is Resource.Success && !historicalResult.data.isNullOrEmpty()) {
-                val latestPrice = historicalResult.data.last().close // Assuming sorted by date ascending
+                val latestPrice = historicalResult.data.last().close
                 val currency = historicalResult.data.last().currency
                 _currentPrice.value = "$latestPrice $currency"
-            }
-            else{
-                _currentPrice.value="0.0 USD"
+            } else {
+                _currentPrice.value = "0.0 USD"
             }
 
-            // Check Watchlist status
             checkWatchlistStatus(symbol)
         }
     }
@@ -117,25 +108,18 @@ class ProductDetailViewModel @Inject constructor(
             if (!found) {
                 _removeResult.value = Resource.Error("Stock not found in any watchlist.")
             }
-            // Refresh status
             checkWatchlistStatus(stock.symbol)
         }
     }
+
     fun onStockAddedToWatchlist(stockSymbol: String) {
-        // After a stock is added (e.g., via dialog), refresh the watchlist status.
-        // This will cause _isStockInAnyWatchlist to update, changing the button state.
         checkWatchlistStatus(stockSymbol)
-        _watchlistEvent.value = WatchlistOperationEvent.StockAdded(stockSymbol) // Optional: signal UI
+        _watchlistEvent.value = WatchlistOperationEvent.StockAdded(stockSymbol)
     }
 
-    // <<<< UPDATED SEALED CLASS FOR WATCHLIST EVENTS >>>>
     sealed class WatchlistOperationEvent {
         data class StockRemoved(val stockSymbol: String) : WatchlistOperationEvent()
-        data class StockAdded(val stockSymbol: String) : WatchlistOperationEvent() // <<<< NEW EVENT
+        data class StockAdded(val stockSymbol: String) : WatchlistOperationEvent()
         data class ShowMessage(val message: String) : WatchlistOperationEvent()
     }
-
-
-
-
 }

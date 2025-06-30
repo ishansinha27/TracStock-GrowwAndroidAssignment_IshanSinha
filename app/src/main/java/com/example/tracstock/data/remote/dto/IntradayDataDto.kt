@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class IntradayDataDto(
     @SerializedName("Meta Data") val metaData: MetaDataDto?,
-    @SerializedName("Time Series (60min)") val timeSeries: Map<String, IntradayTimeSeriesDataDto>? // <<<< FIXED KEY
+    @SerializedName("Time Series (60min)") val timeSeries: Map<String, IntradayTimeSeriesDataDto>?
 )
 data class IntradayTimeSeriesDataDto(
     @SerializedName("1. open") val open: String?,
@@ -16,12 +16,12 @@ data class IntradayTimeSeriesDataDto(
 )
 fun IntradayTimeSeriesDataDto.toHistoricalPrice(dateTime: String, currency:String): HistoricalPrice {
     return HistoricalPrice(
-        date = dateTime, // dateTime will be something like "YYYY-MM-DD HH:MM:SS"
+        date = dateTime,
         open = open ?: "0.0",
         high = high ?: "0.0",
         low = low ?: "0.0",
         close = close ?: "0.0",
-        adjustedClose = close ?: "0.0", // Use close for adjusted close if not explicitly provided
+        adjustedClose = close ?: "0.0",
         volume = volume ?: "0",
         currency = currency
     )

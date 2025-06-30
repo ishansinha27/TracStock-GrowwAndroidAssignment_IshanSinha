@@ -24,28 +24,22 @@ class WatchlistDetailViewModel @Inject constructor(
     private val removeStockFromWatchlist: RemoveStockFromWatchlist
 ) : ViewModel() {
 
-    // Retrieve watchlistId and watchlistName from navigation arguments
+
     val watchlistId: Long = savedStateHandle["watchlistId"] ?: -1L
     val watchlistName: String = savedStateHandle["watchlistName"] ?: "Watchlist Details"
 
-    // StateFlow for the list of stocks in the current watchlist (real-time updates)
+
     val stocksInWatchlist: StateFlow<List<WatchlistItem>> = getStocksInWatchlist(watchlistId)
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000), // Keep collecting for 5s after no active observers
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList() // Initial empty list
         )
 
-    // LiveData for one-time UI events (e.g., success/error messages for stock removal)
+
     private val _eventFlow = MutableLiveData<WatchlistDetailEvent>()
     val eventFlow: LiveData<WatchlistDetailEvent> = _eventFlow
 
-    /**
-     * Removes a specific stock from the current watchlist.
-     * Posts a [WatchlistDetailEvent] based on the result.
-     *
-     * @param stock The [Stock] object to remove.
-     */
     fun onRemoveStockFromWatchlist(stock: Stock) {
         viewModelScope.launch {
             when (val result = removeStockFromWatchlist(watchlistId, stock)) {
@@ -60,9 +54,7 @@ class WatchlistDetailViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Sealed class to represent one-time UI events from the ViewModel to the Fragment.
-     */
+
     sealed class WatchlistDetailEvent {
         data class StockRemoved(val stockSymbol: String) : WatchlistDetailEvent()
         data class ShowMessage(val message: String) : WatchlistDetailEvent()

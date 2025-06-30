@@ -8,8 +8,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.tracstock.data.local.entities.WatchlistEntity
 import com.example.tracstock.data.local.entities.WatchlistItemEntity
-import com.example.tracstock.domain.model.Watchlist
-import com.example.tracstock.domain.model.WatchlistItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -57,9 +57,6 @@ class WatchlistAdapter(
         holder.bind(watchlist)
     }
 
-    /**
-     * DiffUtil Callback for [Watchlist] objects.
-     */
     class WatchlistDiffCallback : DiffUtil.ItemCallback<Watchlist>() {
         override fun areItemsTheSame(oldItem: Watchlist, newItem: Watchlist): Boolean {
             return oldItem.id == newItem.id

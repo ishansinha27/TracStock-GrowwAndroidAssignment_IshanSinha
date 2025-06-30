@@ -27,10 +27,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class ExploreFragment : Fragment() {
 
     private var _binding: FragmentExploreBinding? = null
-    // This property is only valid between onCreateView and onDestroyView.
+
     private val binding get() = _binding!!
 
-    // Inject ViewModel using by viewModels() delegate
     private val viewModel: ExploreViewModel by viewModels()
 
     private lateinit var topGainersAdapter: StockAdapter
@@ -72,11 +71,10 @@ class ExploreFragment : Fragment() {
             layoutManager = GridLayoutManager(context,2)
             adapter = topLosersAdapter
         }
-        searchResultsAdapter = SearchStockAdapter { stock -> // <<<< Use SearchStockAdapter
-            // Navigate to ProductDetailFragment when a search result is clicked
+        searchResultsAdapter = SearchStockAdapter { stock ->
             val action = ExploreFragmentDirections.actionExploreFragmentToProductDetailFragment(stock.symbol)
             findNavController().navigate(action)
-            binding.searchEditText.setText("") // Clear search query
+            binding.searchEditText.setText("")
             binding.searchEditText.clearFocus()
 
         }
@@ -110,31 +108,29 @@ class ExploreFragment : Fragment() {
         }
     }
     private fun observeViewModel() {
-        // Observe Top Gainers
+
         viewModel.topGainers.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     binding.progressBarGainers.visibility = View.VISIBLE
                     binding.errorTextGainers.visibility = View.GONE
-                    binding.rvTopGainers.visibility = View.GONE // Hide content during loading
+                    binding.rvTopGainers.visibility = View.GONE
                 }
                 is Resource.Success -> {
                     binding.progressBarGainers.visibility = View.GONE
                     binding.errorTextGainers.visibility = View.GONE
                     binding.rvTopGainers.visibility = View.VISIBLE
-                    // Submit only a subset (e.g., first 5-6) for the horizontal list
                     topGainersAdapter.submitList(resource.data?.take(6))
                 }
                 is Resource.Error -> {
                     binding.progressBarGainers.visibility = View.GONE
                     if (!resource.data.isNullOrEmpty()) {
-                        // Show cached data
                         binding.rvTopGainers.visibility = View.VISIBLE
                         topGainersAdapter.submitList(resource.data.take(6))
                         binding.errorTextGainers.visibility = View.VISIBLE
                         binding.errorTextGainers.text = resource.message ?: getString(R.string.error_loading_data)
                     } else {
-                        // No data at all, show only error
+
                         binding.rvTopGainers.visibility = View.GONE
                         binding.errorTextGainers.visibility = View.VISIBLE
                         binding.errorTextGainers.text = resource.message ?: getString(R.string.error_loading_data)
@@ -144,7 +140,6 @@ class ExploreFragment : Fragment() {
             }
         }
 
-        // Observe Top Losers
         viewModel.topLosers.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
@@ -161,13 +156,11 @@ class ExploreFragment : Fragment() {
                 is Resource.Error -> {
                     binding.progressBarLosers.visibility = View.GONE
                     if (!resource.data.isNullOrEmpty()) {
-                        // Show cached data
                         binding.rvTopGainers.visibility = View.VISIBLE
                         topGainersAdapter.submitList(resource.data.take(6))
                         binding.errorTextGainers.visibility = View.VISIBLE
                         binding.errorTextGainers.text = resource.message ?: getString(R.string.error_loading_data)
                     } else {
-                        // No data at all, show only error
                         binding.rvTopGainers.visibility = View.GONE
                         binding.errorTextGainers.visibility = View.VISIBLE
                         binding.errorTextGainers.text = resource.message ?: getString(R.string.error_loading_data)
@@ -177,60 +170,52 @@ class ExploreFragment : Fragment() {
             }
         }
 
-        // Observe Search Results
         viewModel.searchResults.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    // Show a progress bar potentially overlaying search results if they are visible
-                    // For now, we'll just handle visibility
                     if (binding.searchEditText.text?.isNotBlank() == true) {
                         binding.searchResultsRecyclerView.visibility = View.VISIBLE
                         binding.exploreScrollView.visibility = View.GONE
-                        // You could add a specific loading spinner for search results here
+
                     }
                 }
                 is Resource.Success -> {
-                    // Hide any search specific loading spinner
+
                     val results = resource.data
                     if (binding.searchEditText.text?.isNotBlank() == true) {
                         if (results.isNullOrEmpty()) {
-                            // Show "No results" message
+
                             binding.searchResultsRecyclerView.visibility = View.GONE
-                            binding.exploreScrollView.visibility = View.VISIBLE // Show main content again
+                            binding.exploreScrollView.visibility = View.VISIBLE
                             binding.root.showSnackbar(getString(R.string.no_search_results))
                         } else {
                             searchResultsAdapter.submitList(results)
                             binding.searchResultsRecyclerView.visibility = View.VISIBLE
-                            binding.exploreScrollView.visibility = View.GONE // Hide main content
+                            binding.exploreScrollView.visibility = View.GONE
                         }
                     } else {
-                        // Query is blank, hide results and show main content
+
                         binding.searchResultsRecyclerView.visibility = View.GONE
                         binding.exploreScrollView.visibility = View.VISIBLE
                     }
                 }
                 is Resource.Error -> {
-                    // Hide any search specific loading spinner
                     binding.searchResultsRecyclerView.visibility = View.GONE
-                    binding.exploreScrollView.visibility = View.VISIBLE // Show main content
+                    binding.exploreScrollView.visibility = View.VISIBLE
                     binding.root.showSnackbar(resource.message ?: getString(R.string.error_loading_data))
                 }
             }
         }
     }
 
-    /**
-     * Sets up click listeners for "View All" buttons.
-     */
+
     private fun setupClickListeners() {
         binding.btnViewAllGainers.setOnClickListener {
-            // Navigate to ViewAllFragment, passing the category "top_gainers"
             val action = ExploreFragmentDirections.actionExploreFragmentToViewAllFragment("top_gainers")
             findNavController().navigate(action)
         }
 
         binding.btnViewAllLosers.setOnClickListener {
-            // Navigate to ViewAllFragment, passing the category "top_losers"
             val action = ExploreFragmentDirections.actionExploreFragmentToViewAllFragment("top_losers")
             findNavController().navigate(action)
         }

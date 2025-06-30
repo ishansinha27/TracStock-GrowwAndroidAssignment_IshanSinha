@@ -13,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController // Ensure this import is present!
+import androidx.navigation.fragment.findNavController
 
 import com.example.tracstock.domain.model.Stock
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,7 +23,7 @@ import com.example.tracstock.util.showSnackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.example.tracstock.domain.model.Watchlist // Import Watchlist model
+import com.example.tracstock.domain.model.Watchlist
 
 @AndroidEntryPoint
 class AddWatchlistDialogFragment : DialogFragment() {
@@ -31,12 +31,12 @@ class AddWatchlistDialogFragment : DialogFragment() {
     private var _binding: DialogAddWatchlistBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: WatchlistViewModel by viewModels() // Use shared ViewModel
+    private val viewModel: WatchlistViewModel by viewModels()
     private val args : AddWatchlistDialogFragmentArgs by navArgs()
 
     private var selectedWatchlistId: Long? = null
     private var selectedWatchlistName: String? = null
-    private var allWatchlists: List<Watchlist> = emptyList() // <<<< FIX: Declare allWatchlists here
+    private var allWatchlists: List<Watchlist> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,20 +49,17 @@ class AddWatchlistDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Adjust dialog title based on mode
         binding.dialogTitle.text = if (args.isAddToWatchlist) {
             getString(R.string.add_to_watchlist_dialog_title)
         } else {
             getString(R.string.dialog_create_watchlist_title)
         }
 
-        // Conditionally show/hide sections based on `isAddToWatchlist` argument
         if (args.isAddToWatchlist) {
             binding.newWatchlistSection.visibility = View.VISIBLE
             binding.orTextView.visibility = View.VISIBLE
             binding.existingWatchlistSection.visibility = View.VISIBLE
         } else {
-            // Only show new watchlist creation if not adding a specific stock
             binding.newWatchlistSection.visibility = View.VISIBLE
             binding.orTextView.visibility = View.GONE
             binding.existingWatchlistSection.visibility = View.GONE
@@ -72,9 +69,6 @@ class AddWatchlistDialogFragment : DialogFragment() {
         observeViewModel()
     }
 
-    /**
-     * Sets up click listeners for buttons in the dialog.
-     */
     private fun setupClickListeners() {
         binding.createWatchlistButton.setOnClickListener {
             val newWatchlistName = binding.newWatchlistNameEditText.text.toString().trim()
@@ -85,7 +79,7 @@ class AddWatchlistDialogFragment : DialogFragment() {
             if (selectedWatchlistId != null && args.stockSymbol != null) {
                 val stockToAdd = Stock(
                     symbol = args.stockSymbol!!,
-                    name = args.stockName ?: args.stockSymbol!!, // Fallback to symbol if name is null
+                    name = args.stockName ?: args.stockSymbol!!,
                     price = args.stockPrice ?: "0.0",
                     currency = args.stockCurrency ?: "USD"
                 )
@@ -96,16 +90,13 @@ class AddWatchlistDialogFragment : DialogFragment() {
         }
     }
 
-    /**
-     * Observes LiveData and StateFlow from the ViewModel.
-     */
     private fun observeViewModel() {
-        // Observe watchlists for the dropdown (only if in add-to-watchlist mode)
+
         if (args.isAddToWatchlist) {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.watchlists.collectLatest { watchlists ->
-                        allWatchlists = watchlists // <<<< FIX: Assign collected watchlists to allWatchlists
+                        allWatchlists = watchlists
                         if (watchlists.isEmpty()) {
                             delay(2500)
                             binding.existingWatchlistSection.visibility = View.GONE
@@ -117,7 +108,7 @@ class AddWatchlistDialogFragment : DialogFragment() {
                             binding.orTextView.visibility = View.VISIBLE
                             binding.dialogTitle.text = getString(R.string.add_to_watchlist_dialog_title)
 
-                            // Populate AutoCompleteTextView with watchlist names
+
                             val watchlistNames = watchlists.map { it.name }
                             val adapter = ArrayAdapter(
                                 requireContext(),
@@ -126,7 +117,7 @@ class AddWatchlistDialogFragment : DialogFragment() {
                             )
                             binding.existingWatchlistAutoCompleteTextView.setAdapter(adapter)
 
-                            // Listen for selection changes in the dropdown
+
                             binding.existingWatchlistAutoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
                                 val selectedName = parent.getItemAtPosition(position).toString()
                                 val selectedWatchlist = watchlists.find { it.name == selectedName }
@@ -134,7 +125,7 @@ class AddWatchlistDialogFragment : DialogFragment() {
                                 selectedWatchlistName = selectedWatchlist?.name
                             }
 
-                            // Pre-select the first watchlist if none is selected initially
+
                             if (selectedWatchlistId == null) {
                                 val firstWatchlist = watchlists.firstOrNull()
                                 if (firstWatchlist != null) {
@@ -150,16 +141,12 @@ class AddWatchlistDialogFragment : DialogFragment() {
         }
 
 
-        // Observe one-time events from the ViewModel
+
         viewModel.eventFlow.observe(viewLifecycleOwner) { event ->
             when (event) {
                 is WatchlistViewModel.WatchlistEvent.WatchlistCreated -> {
-                    // Show success message and dismiss dialog
                     binding.root.showSnackbar(getString(R.string.watchlist_created_success, binding.newWatchlistNameEditText.text.toString().trim()))
-                    // If stock is being added, automatically select the new watchlist
                     if (args.isAddToWatchlist) {
-                        // Find the position of the newly created watchlist and select it
-                        // <<<< FIX: Use AutoCompleteTextView instead of Spinner, and update selection logic >>>>
                         val newWatchlistPosition = allWatchlists.indexOfFirst { it.id == event.watchlistId }
                         if (newWatchlistPosition != -1) {
                             val newWatchlistName = allWatchlists[newWatchlistPosition].name
@@ -168,21 +155,18 @@ class AddWatchlistDialogFragment : DialogFragment() {
                             selectedWatchlistName = newWatchlistName
                         }
                     } else {
-                        dismiss() // Dismiss if only creating a watchlist
+                        dismiss()
                     }
                 }
                 is WatchlistViewModel.WatchlistEvent.StockAddedToWatchlist -> {
                     binding.root.showSnackbar(getString(R.string.stock_added_to_watchlist_success, event.stockSymbol))
-                    // <<<< CRITICAL FIX: Set result for ProductDetailFragment >>>>
                     findNavController().previousBackStackEntry?.savedStateHandle?.set("stockAddedToWatchlist", true)
-                    dismiss() // Dismiss dialog on successful add
+                    dismiss()
                 }
                 is WatchlistViewModel.WatchlistEvent.ShowMessage -> {
                     binding.root.showSnackbar(event.message)
                 }
                 is WatchlistViewModel.WatchlistEvent.WatchlistDeleted -> {
-                    // This event is primarily for WatchlistFragment; dialog doesn't delete watchlists itself.
-                    // If it somehow gets here, ignore or log.
                 }
             }
         }

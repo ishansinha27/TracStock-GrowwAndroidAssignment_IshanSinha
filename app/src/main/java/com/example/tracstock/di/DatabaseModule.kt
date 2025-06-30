@@ -2,7 +2,8 @@ package com.example.tracstock.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
+import com.example.tracstock.data.local.dao.CompanyOverviewDao
+import com.example.tracstock.data.local.dao.HistoricalDataDao
 import com.example.tracstock.data.local.dao.StockCacheDao
 import com.example.tracstock.data.local.dao.WatchlistDao
 import com.example.tracstock.data.local.database.AppDatabase
@@ -39,5 +40,16 @@ object DatabaseModule {
     @Singleton
     fun provideWatchlistDao(database: AppDatabase): WatchlistDao {
         return database.WatchlistDao()
+    }
+    @Provides
+    @Singleton
+    fun provideCompanyOverviewDao(database: AppDatabase): CompanyOverviewDao {
+        return database.companyOverviewDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHistoricalDataDao(database: AppDatabase): HistoricalDataDao {
+        return database.historicalDataDao()
     }
 }

@@ -14,11 +14,11 @@ object DateUtils {
             if (date != null) {
                 outputFormat.format(date)
             } else {
-                dateString // Return original if parsing fails
+                dateString
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            dateString // Return original on error
+            dateString
         }
     }
 
@@ -28,7 +28,7 @@ object DateUtils {
             inputFormat.parse(dateString)?.time ?: -1L
         } catch (e: Exception) {
             e.printStackTrace()
-            -1L // Return -1 on error
+            -1L
         }
     }
 }

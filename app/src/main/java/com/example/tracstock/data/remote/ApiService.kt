@@ -25,20 +25,14 @@ interface ApiService {
     ): CompanyOverviewDto
 
     @GET("query")
-    suspend fun getHistoricalDailyAdjusted( // Method name retained for consistency with ViewModel/Repo
+    suspend fun getHistoricalDailyAdjusted(
         @Query("function") function: String = "TIME_SERIES_INTRADAY",
         @Query("symbol") symbol: String,
-        @Query("interval") interval: String = "60min", // <<<< FIXED INTERVAL
-        @Query("extended_hours") extendedHours: String = "false", // <<<< NEW PARAMETER
+        @Query("interval") interval: String = "60min",
+        @Query("extended_hours") extendedHours: String = "false",
         @Query("apikey") apiKey: String
     ): IntradayDataDto
 
-//    @GET("query")
-//    suspend fun getHistoricalDailyAdjusted(
-//        @Query("function") function: String = "TIME_SERIES_DAILY_ADJUSTED",
-//        @Query("symbol") symbol: String,
-//        @Query("apikey") apiKey: String
-//    ): HistoricalDataDto
 
     @GET("query")
     suspend fun searchSymbol(

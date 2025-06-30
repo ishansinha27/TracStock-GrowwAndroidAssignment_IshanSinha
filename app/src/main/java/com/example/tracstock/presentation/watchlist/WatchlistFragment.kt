@@ -74,9 +74,6 @@ class WatchlistFragment : Fragment() {
         }
     }
 
-    /**
-     * Sets up click listeners for the FAB and empty state button.
-     */
     private fun setupClickListeners() {
         binding.addWatchlistFab.setOnClickListener {
             // Navigate to AddWatchlistDialogFragment (for creating a new watchlist)
@@ -95,17 +92,7 @@ class WatchlistFragment : Fragment() {
         }
     }
 
-    /**
-     * Observes LiveData and StateFlow from the ViewModel and updates the UI.
-     */
     private fun observeViewModel() {
-
-
-
-
-
-
-        // Observe the list of watchlists
         val launch = viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.watchlists.collectLatest { watchlists ->
@@ -141,9 +128,6 @@ class WatchlistFragment : Fragment() {
         }
     }
 
-    /**
-     * Displays a confirmation dialog before deleting a watchlist.
-     */
     private fun showDeleteConfirmationDialog(watchlist: Watchlist) {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.confirm_delete_watchlist_title))

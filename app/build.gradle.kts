@@ -1,13 +1,6 @@
 import java.util.Properties
 
 
-val localProperties = Properties().apply {
-    val localFile = rootProject.file("local.properties")
-    if (localFile.exists()) {
-        load(localFile.inputStream())
-    }
-}
-val alphaVantageApiKey = localProperties["API_KEY"] as String? ?: ""
 
 
 

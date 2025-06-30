@@ -37,11 +37,6 @@ class ViewAllViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Fetches stocks based on the provided category.
-     *
-     * @param category The category identifier (e.g., "top_gainers", "top_losers").
-     */
     private fun fetchStocksByCategory(category: String) {
         viewModelScope.launch {
             when (category) {
