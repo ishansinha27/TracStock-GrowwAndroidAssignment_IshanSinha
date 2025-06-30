@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    tools:context=".presentation.explore.ExploreFragment">
+
+    <!-- Search Bar -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchTextInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:hintEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_rounded_search_bar"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="textCapWords"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp"
+            android:singleLine="true"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textColorHint="?android:attr/textColorSecondary"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Search Results RecyclerView (initially hidden) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchResultsRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_rounded_search_results"
+        android:elevation="4dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchTextInputLayout"
+        tools:listitem="@layout/item_stock" />
+
+    <ScrollView
+        android:id="@+id/exploreScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchTextInputLayout">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp">
+
+            <!-- Top Gainers Section -->
+            <TextView
+                android:id="@+id/topGainersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/top_gainers_title"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewAllGainers"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/view_all"
+                android:textColor="?attr/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/topGainersTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/topGainersTitle" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTopGainers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/topGainersTitle"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_stock" />
+
+            <ProgressBar
+                android:id="@+id/progressBarGainers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/rvTopGainers"
+                app:layout_constraintEnd_toEndOf="@id/rvTopGainers"
+                app:layout_constraintStart_toStartOf="@id/rvTopGainers"
+                app:layout_constraintTop_toTopOf="@id/rvTopGainers" />
+
+            <TextView
+                android:id="@+id/errorTextGainers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:textAlignment="center"
+                android:textColor="@color/colorLoss"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/rvTopGainers"
+                app:layout_constraintEnd_toEndOf="@id/rvTopGainers"
+                app:layout_constraintStart_toStartOf="@id/rvTopGainers"
+                app:layout_constraintTop_toTopOf="@id/rvTopGainers"
+                tools:text="Failed to load gainers." />
+
+
+            <!-- Top Losers Section -->
+            <TextView
+                android:id="@+id/topLosersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/top_losers_title"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rvTopGainers" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewAllLosers"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/view_all"
+                android:textColor="?attr/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/topLosersTitle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/topLosersTitle" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTopLosers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/topLosersTitle"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_stock" />
+
+            <ProgressBar
+                android:id="@+id/progressBarLosers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/rvTopLosers"
+                app:layout_constraintEnd_toEndOf="@id/rvTopLosers"
+                app:layout_constraintStart_toStartOf="@id/rvTopLosers"
+                app:layout_constraintTop_toTopOf="@id/rvTopLosers" />
+
+            <TextView
+                android:id="@+id/errorTextLosers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:textAlignment="center"
+                android:textColor="@color/colorLoss"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/rvTopLosers"
+                app:layout_constraintEnd_toEndOf="@id/rvTopLosers"
+                app:layout_constraintStart_toStartOf="@id/rvTopLosers"
+                app:layout_constraintTop_toTopOf="@id/rvTopLosers"
+                tools:text="Failed to load losers." />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/exploreFragment">
+
+    <!-- Explore Fragment -->
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.example.tracstock.presentation.explore.ExploreFragment"
+        android:label="@string/title_explore"
+        tools:layout="@layout/fragment_explore">
+
+        <!-- Actions from Explore Fragment -->
+        <action
+            android:id="@+id/action_exploreFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment">
+            <argument
+                android:name="symbol"
+                app:argType="string" />
+        </action>
+        <action
+            android:id="@+id/action_exploreFragment_to_viewAllFragment"
+            app:destination="@id/viewAllFragment">
+            <argument
+                android:name="category"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <!-- Watchlist Fragment -->
+    <fragment
+        android:id="@+id/watchlistFragment"
+        android:name="com.example.tracstock.presentation.watchlist.WatchlistFragment"
+        android:label="@string/title_watchlist"
+        tools:layout="@layout/fragment_watchlist">
+
+        <!-- Actions from Watchlist Fragment -->
+        <action
+            android:id="@+id/action_watchlistFragment_to_watchlistDetailFragment"
+            app:destination="@id/watchlistDetailFragment">
+            <argument
+                android:name="watchlistId"
+                app:argType="long" />
+            <argument
+                android:name="watchlistName"
+                app:argType="string" />
+        </action>
+        <action
+            android:id="@+id/action_watchlistFragment_to_addWatchlistDialogFragment"
+            app:destination="@id/addWatchlistDialogFragment" />
+    </fragment>
+
+    <!-- Product Detail Fragment -->
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.tracstock.presentation.productdetail.ProductDetailFragment"
+        android:label="{symbol}"
+        tools:layout="@layout/fragment_product_detail">
+        <!-- Argument for stock symbol -->
+        <argument
+            android:name="symbol"
+            app:argType="string" />
+        <!-- Actions from Product Detail Fragment -->
+        <action
+            android:id="@+id/action_productDetailFragment_to_addWatchlistDialogFragment"
+            app:destination="@id/addWatchlistDialogFragment">
+            <argument
+                android:name="stockSymbol"
+                app:argType="string" />
+            <argument
+                android:name="stockName"
+                app:argType="string" />
+            <argument
+                android:name="stockPrice"
+                app:argType="string" />
+            <argument
+                android:name="stockCurrency"
+                app:argType="string" />
+            <argument
+                android:name="isAddToWatchlist"
+                app:argType="boolean"
+                android:defaultValue="true" />
+        </action>
+    </fragment>
+
+    <!-- View All Fragment -->
+    <fragment
+        android:id="@+id/viewAllFragment"
+        android:name="com.example.tracstock.presentation.viewall.ViewAllFragment"
+        android:label="{category}"
+        tools:layout="@layout/fragment_view_all">
+        <!-- Argument for category (e.g., "top_gainers", "top_losers") -->
+        <argument
+            android:name="category"
+            app:argType="string" />
+        <!-- Action to Product Detail from View All -->
+        <action
+            android:id="@+id/action_viewAllFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment">
+            <argument
+                android:name="symbol"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <!-- Watchlist Detail Fragment -->
+    <fragment
+        android:id="@+id/watchlistDetailFragment"
+        android:name="com.example.tracstock.presentation.watchlist.WatchlistDetailFragment"
+        android:label="{watchlistName}"
+        tools:layout="@layout/fragment_watchlist_detail">
+        <argument
+            android:name="watchlistId"
+            app:argType="long" />
+        <argument
+            android:name="watchlistName"
+            app:argType="string" />
+        <!-- Action to Product Detail from Watchlist Detail -->
+        <action
+            android:id="@+id/action_watchlistDetailFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment">
+            <argument
+                android:name="symbol"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <!-- Add Watchlist Dialog Fragment (using dialog destination type) -->
+    <dialog
+        android:id="@+id/addWatchlistDialogFragment"
+        android:name="com.example.tracstock.presentation.dialogs.AddWatchlistDialogFragment"
+        android:label="Add to Watchlist"
+        tools:layout="@layout/dialog_add_watchlist">
+        <!-- Arguments for stock details when adding from Product Detail -->
+        <argument
+            android:name="stockSymbol"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="stockName"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="stockPrice"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="stockCurrency"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="isAddToWatchlist"
+            app:argType="boolean"
+            android:defaultValue="true" />
+    </dialog>
+
+</navigation>
